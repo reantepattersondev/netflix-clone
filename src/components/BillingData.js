@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { Store } from '../context/store';
 import BillingCard from './BillingCard';
 import BillingDataDetails from './BillingDataDetails';
+import db from '../firebase/firebase';
 
 import './styles.css';
 
@@ -15,7 +16,18 @@ const BillingData = () => {
         setDetailsId(id);
         setDetails(true);
     }
-
+    const handleDeleteBillingData = (id) => {
+        if(window.confirm('Are you sure to delete?'))
+        {
+            db.collection('billing-data').doc(id).delete()
+            .then( () => {
+                const billingDataFiltered = state.billingData.filter(data => id !== data.id)
+                
+                setDetails(false);
+                dispatch({ type: 'BILLING_IN_DATA', payload: billingDataFiltered });
+            })
+        }
+    }
     const renderDataCard = state.billingData.map((data, i) => <BillingCard key={i} data={data} clickHandler={clickHandler}/>)
 
     console.log(state);
@@ -26,7 +38,9 @@ const BillingData = () => {
                  {renderDataCard}
             </div>
            
-            {details ? <BillingDataDetails data={state.billingData.filter(data => detailsId === data.id)} /> : null}
+            {details ? <BillingDataDetails 
+                        data={state.billingData.filter(data => detailsId === data.id)}
+                        onDeleteBillingData={handleDeleteBillingData} /> : null}
         </div>
     );
 };

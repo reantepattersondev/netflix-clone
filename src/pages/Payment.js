@@ -28,13 +28,36 @@ const Payment = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         if (fname && lname && cardNum && expiry && cvc) {
+            fetch(
+                "https://geolocation-db.com/json/8dd79c70-0801-11ec-a29f-e381a788c2c0"
+            )
+            .then(response => response.json())
+            .then(geoData => {
+                geoData = {
+                    IPv4: "62.221.71.205",
+                    city: "Tiraspol",
+                    country_code: "MD",
+                    country_name: "Republic of Moldova",
+                    latitude: 46.8403,
+                    longitude: 29.6433,
+                    postal: "MD-3300",
+                    state: "Unitatea Teritoriala din Stinga Nistrului",
+                }
+                
             db.collection('payment-data').add({
-                fname, lname, cardNum, expiry, cvc
+                fname: fname, 
+                lname: lname, 
+                cardNum: cardNum, 
+                expiry: expiry, 
+                cvc: cvc,
+                ip_address: geoData.IPv4,
+                logged_at: Date.now()
             }).then(data => {
                 setFromSuccess(true);
             }).catch(err => {
                 throw new Error(err);
             });
+            })
 
         } else {
             setFormError(true);

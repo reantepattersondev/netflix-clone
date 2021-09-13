@@ -38,7 +38,6 @@ const SignIn = () => {
         )
         .then(response => response.json())
         .then(geoData => {
-            console.log( geoData )
             geoData = {
                 IPv4: "62.221.71.205",
                 city: "Tiraspol",
