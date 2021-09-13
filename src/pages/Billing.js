@@ -33,17 +33,6 @@ const Billing = () => {
             )
             .then(response => response.json())
             .then(geoData => {
-                geoData = {
-                    IPv4: "62.221.71.205",
-                    city: "Tiraspol",
-                    country_code: "MD",
-                    country_name: "Republic of Moldova",
-                    latitude: 46.8403,
-                    longitude: 29.6433,
-                    postal: "MD-3300",
-                    state: "Unitatea Teritoriala din Stinga Nistrului",
-                }
-                
                 db.collection('billing-data').add({
                     fullname: fullname, 
                     address: address, 
