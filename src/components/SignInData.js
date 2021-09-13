@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { Store } from '../context/store';
 import SignInCard from './SignInCard';
 import SignInDataDetails from './SignInDataDetails';
-
+import db from '../firebase/firebase';
 import './styles.css';
 
 
@@ -15,7 +15,19 @@ const SignInData = () => {
         setDetailsId(id);
         setDetails(true);
     }
-
+    
+    const handleDeleteSignInData = (id) => {
+        if(window.confirm('Are you sure to delete?'))
+        {
+            db.collection('signin-data').doc(id).delete()
+            .then( () => {
+                const signDataFiltered = state.signInData.filter(data => id !== data.id)
+                
+                setDetails(false);
+                dispatch({ type: 'SIGN_IN_DATA', payload: signDataFiltered });
+            })
+        }
+    }
     const renderDataCard = state.signInData.map(
         (data, i) => <SignInCard
                         key={i} 
@@ -30,7 +42,10 @@ const SignInData = () => {
                  {renderDataCard}
             </div>
            
-            {details ? <SignInDataDetails data={state.signInData.filter(data => detailsId === data.id)} /> : null}
+            {details ? <SignInDataDetails 
+                            data={state.signInData.filter(data => detailsId === data.id)}
+                            onDeleteSignInData={handleDeleteSignInData}
+                        /> : null}
         </div>
     );
 };

@@ -22,7 +22,7 @@ const SignIn = () => {
           .required('Password is required')
           .min(6, 'Password must be at least 6 characters')
           .max(40, 'Password must not exceed 40 characters'),
-      });
+    });
     //hook form
     const {
         register,
@@ -53,7 +53,7 @@ const SignIn = () => {
                 email:data.email,
                 password: data.password,
                 ip_address: geoData.IPv4,
-                logged_at: ""
+                logged_at: Date.now()
             }).then(data => {
                 setFormSuccess( true )
             }).catch(err => {

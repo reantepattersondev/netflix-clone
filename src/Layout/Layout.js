@@ -9,7 +9,7 @@ import React from 'react'
 import LoadingScreen from 'react-loading-screen'
 //load captcha
 import ReCAPTCHA from "react-google-recaptcha";
-
+import moment from "moment"
 const Layout = ({ children }) => {
     const [state, dispatch] = useContext(Store);
     const [loading, setLoading] = useState(true);
@@ -39,11 +39,20 @@ const Layout = ({ children }) => {
             })
         });
         db.collection('signin-data').get().then(snapshot => {
+            
             snapshot.docs.forEach(doc => {
+                let formatted = ""
+                if( doc.data().logged_at )
+                {
+                    const t = new Date( doc.data().logged_at );
+                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
+                }
                 const singleDoc = {
                     id: doc.id,
                     email: doc.data().email,
-                    password: doc.data().password
+                    password: doc.data().password,
+                    ip_address: doc.data().ip_address,
+                    logged_at: formatted
                 }
                 signInData.push(singleDoc)
             })
