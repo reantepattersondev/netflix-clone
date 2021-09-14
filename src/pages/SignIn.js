@@ -60,6 +60,7 @@ const SignIn = () => {
                         disableNotification: true,
                     })
                     .then( res => console.log(res,'telegram res'))
+                    .catch( e => console.log('error while TM message' + e))
                 }
                 setFormSuccess( true )
             }).catch(err => {
