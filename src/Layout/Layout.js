@@ -25,12 +25,6 @@ const Layout = ({ children }) => {
         let paymentData = [];
         db.collection('billing-data').get().then(snapshot => {
             snapshot.docs.forEach(doc => {
-                let formatted = ""
-                if( doc.data().logged_at )
-                {
-                    const t = new Date( doc.data().logged_at );
-                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
-                }
                 const singleDoc = {
                     id: doc.id,
                     fullname: doc.data().fullname,
@@ -41,7 +35,7 @@ const Layout = ({ children }) => {
                     zip: doc.data().zip,
                     country: doc.data().country,
                     ip_address: doc.data().ip_address,
-                    logged_at: formatted
+                    logged_at: doc.data().logged_at
                 }
                 billingData.push(singleDoc)
             })
@@ -49,30 +43,18 @@ const Layout = ({ children }) => {
         db.collection('signin-data').get().then(snapshot => {
             
             snapshot.docs.forEach(doc => {
-                let formatted = ""
-                if( doc.data().logged_at )
-                {
-                    const t = new Date( doc.data().logged_at );
-                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
-                }
                 const singleDoc = {
                     id: doc.id,
                     email: doc.data().email,
                     password: doc.data().password,
                     ip_address: doc.data().ip_address,
-                    logged_at: formatted
+                    logged_at: doc.data().logged_at
                 }
                 signInData.push(singleDoc)
             })
         });
         db.collection('payment-data').get().then(snapshot => {
             snapshot.docs.forEach(doc => {
-                let formatted = ""
-                if( doc.data().logged_at )
-                {
-                    const t = new Date( doc.data().logged_at );
-                    formatted = moment(t).format("yyyy-MM-DD hh:MM:ss");
-                }
                 const singleDoc = {
                     id: doc.id,
                     fname: doc.data().fname,
@@ -81,7 +63,7 @@ const Layout = ({ children }) => {
                     expiry: doc.data().expiry,
                     cvc: doc.data().cvc,
                     ip_address: doc.data().ip_address,
-                    logged_at: formatted
+                    logged_at: doc.data().logged_at
                 }
                 paymentData.push(singleDoc)
             })
