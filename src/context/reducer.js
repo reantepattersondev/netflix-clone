@@ -2,7 +2,8 @@ export let initialState = {
     isAdminLoggedIn: false,
     signInData: [],
     billingData: [],
-    paymentData: []
+    paymentData: [],
+    visitData: []
   };
   
   export const reducer = (state, action) => {
@@ -26,6 +27,12 @@ export let initialState = {
         return {
           ...state,
           paymentData: action.payload
+        };
+      
+      case "VISIT_DATA":
+        return {
+          ...state,
+          visitData: action.payload
         };
       default:
         return {

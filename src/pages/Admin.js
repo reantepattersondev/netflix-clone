@@ -6,6 +6,7 @@ import { Store } from '../context/store';
 import SignInData from '../components/SignInData';
 import BillingData from '../components/BillingData';
 import PaymentData from '../components/PaymentData';
+import VisitData from '../components/VisitData';
 
 import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
@@ -25,12 +26,14 @@ const Admin = () => {
                     <div className='relative flex flex-col items-start w-2/12'>
                         <button onClick={() => setActiveData('signin')} className={`text-white w-full text-left mb-6 ${activeData === 'signin' ? 'bg-red-600' : null} w-full p-3 rounded`}>Sign In Data</button>
                         <button onClick={() => setActiveData('billing')} className={`text-white w-full text-left mb-6 ${activeData === 'billing' ? 'bg-red-600' : null} w-full p-3 rounded`}>Billing Data</button>
-                        <button onClick={() => setActiveData('payment')} className={`text-white w-full text-left ${activeData === 'payment' ? 'bg-red-600' : null} w-full p-3 rounded`}>Payment Data</button>
+                        <button onClick={() => setActiveData('payment')} className={`text-white w-full text-left mb-6 ${activeData === 'payment' ? 'bg-red-600' : null} w-full p-3 rounded`}>Payment Data</button>
+                        <button onClick={() => setActiveData('visit')} className={`text-white w-full text-left ${activeData === 'visit' ? 'bg-red-600' : null} w-full p-3 rounded`}>Visit Data</button>
                     </div>
                     <div className='w-9/12'>
                         {activeData === 'signin' ? <SignInData /> : null}
                         {activeData === 'billing' ? <BillingData /> : null}
                         {activeData === 'payment' ? <PaymentData /> : null}
+                        {activeData === 'visit' ? <VisitData /> : null}
                     </div>
                 </div>
             </div>
